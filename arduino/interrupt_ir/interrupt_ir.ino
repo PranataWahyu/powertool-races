@@ -3,6 +3,32 @@
 //Hooked up to normally-closed nonlatching pushbutton switch. Other end goes to ground.
 #define START_PIN 8
 
+//The "circuit":
+//Arduino connected to computer via usb FTDI cable (for serial).
+//GND arduino pin -> ground rail on breadboard.
+//VCC arduino pin -> hot rail on breadboard
+//Switch: one end to ground rail on breadboard
+//        other end to START_PIN (pin 8) on the arduino
+//IR sender:
+//Black wire -> ground rail on breadboard
+//Red wire  -> hot rail on breadboard
+
+//IR receiver:
+//Black wire -> ground rail on breadboard
+//Red wire -> hot rail on breadboard
+//Yellow / green wire -> END_PIN (2) on the arduino.
+
+//Make sure the IR sensors are pointed at each other across the track.
+
+//To time a race, open up the serial monitor in the arduino program
+//(Tools -> Serial Monitor).
+//It should say "starting up...".
+//Click the button to start timing.
+//Serial monitor should say "Starting..."
+//Then when the beam is broken you should see
+//"Stopped. End Time: xxxx"
+//Total time: X milliseconds
+
 //ASR routine vars need to be volatile.
 volatile unsigned long endTime;
 //When the current race started (i.e. when the button was pushed)
