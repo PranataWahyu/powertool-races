@@ -1,8 +1,9 @@
+//My arduino requires you to select Tools -> Programmer AVRISP mkll as the programmer
 //Hooked up to signal pin of IR reader
 #define END_PIN 2
 //Hooked up to normally-closed nonlatching pushbutton switch. Other end goes to ground.
 #define START_PIN 8
-
+#define MICROBIT_PIN 4
 //The "circuit":
 //Arduino connected to computer via usb FTDI cable (for serial).
 //GND arduino pin -> ground rail on breadboard.
@@ -43,6 +44,7 @@ void setup() {
   Serial.write("starting up...\n");
   pinMode(END_PIN, INPUT_PULLUP);
   pinMode(START_PIN, INPUT_PULLUP);
+  pinMode(MICROBIT_PIN, OUTPUT);
   //set an interrupt to trigger whenever the IR pin changes
   attachInterrupt(digitalPinToInterrupt(END_PIN), endfn, CHANGE);
   started = false;
@@ -50,18 +52,30 @@ void setup() {
   recordEnd = false;
   startTime=0;
   endTime = 0;
+  digitalWrite(MICROBIT_PIN, LOW);
 }
 
 void loop() {
   // Race start (!started condition because the switch bounces).
   if(!started && digitalRead(START_PIN) == HIGH)
   {
-    Serial.write("Starting...\n");
+
+
+       
     startTime = millis();
     started = true;
     endTime = 0;
     stopped = false;
     recordEnd = true;
+    //temp: Check clock skew between arduino and microbit - turn off after exactly 10 seconds.
+    //delay(10000);
+    //digitalWrite(MICROBIT_PIN, HIGH);
+    //delay(1000);
+    //digitalWrite(MICROBIT_PIN, LOW);
+    //started = false;
+    //end temp
+    Serial.write("Starting...\n");
+   
   }
   if(started)
   {
@@ -99,6 +113,9 @@ void endfn()
   {
     endTime = millis();
     recordEnd = false;
+    digitalWrite(MICROBIT_PIN, HIGH);
+    delay(5000);
+    digitalWrite(MICROBIT_PIN, LOW);
   }
 }
 
