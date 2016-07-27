@@ -1,0 +1,11 @@
+basic.forever(() => {
+    radio.setGroup(14);
+    radio.setTransmitPower(7);
+    radio.setTransmitSerialNumber(true);
+    let acc = 9 * input.acceleration(Dimension.X) / 1000;
+    if (acc < 0) {
+        radio.sendNumber(((1 << 12) | Math.abs(acc)));
+    } else {
+        radio.sendNumber(acc);
+    }
+});

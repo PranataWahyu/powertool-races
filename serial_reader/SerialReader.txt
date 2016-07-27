@@ -1,0 +1,65 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.IO.Ports;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace coolbeans
+{
+    class Program
+    {
+        string nameone = "\\racerone.dat";
+        string nametwo = "\\racertwo.dat";
+        string currentname = string.Empty;
+        List<string> master = new List<string>();
+
+        SerialPort _serialPort = new SerialPort("COM3", 115200, Parity.None, 8, StopBits.One);
+        string sbuffer = string.Empty;
+        byte i = 0;
+        static void Main(string[] args)
+        {
+            new Program();
+        }
+
+        Program()
+        {
+            string[] names = SerialPort.GetPortNames();
+            currentname = nameone;
+            Console.WriteLine("Serial ports:");
+            foreach (string name in names)
+            {
+                Console.WriteLine(name);
+            }
+            Console.WriteLine("Using COM3");
+
+            _serialPort.Open();
+
+
+            string data_ = "$1RB\r";
+            Console.WriteLine("Writing data: {0}", data_);
+            string message = _serialPort.ReadExisting();
+            Console.WriteLine(message);
+            String[] substrings = message.Split('\n');
+            foreach (var substring in substrings)
+            {
+                if (substring == "Other_Racer\r") currentname = nametwo;
+                else WriteOutputToTextFile(substring, currentname);
+            }
+            _serialPort.Close();
+        }
+
+        static void WriteOutputToTextFile(string _data, string name)
+        {
+            string FolderName = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);   //set destination as your desktop
+            using (StreamWriter SW = new StreamWriter(FolderName + name, true))   //true makes it append to the file instead of overwrite
+            {
+                SW.WriteLine(_data);
+                SW.Close();
+            }
+        }
+    }
+}
+
