@@ -1,0 +1,49 @@
+let end = 0;
+let start = 0;
+let lap = 0;
+let state = 0;
+let logo = 0;
+pins.setPull(DigitalPin.P1, PinPullMode.PullUp);
+radio.setTransmitPower(7);
+basic.showNumber(1000);
+basic.forever(() => {
+    if (0 == state && 1 == pins.digitalReadPin(DigitalPin.P1)) {
+        start = input.runningTime();
+        state = 1;
+        logo = 1;
+    } else if (1 == state && 800 < pins.analogReadPin(AnalogPin.P0)) {
+        end = input.runningTime();
+        state = 0;
+        lap = end - start;
+        logo = 2;
+    } else if (input.buttonIsPressed(Button.B)) {
+        lap = 0;
+        end = 0;
+        start = 0;
+        state = 0;
+        logo = 0;
+    }
+});
+basic.forever(() => {
+    if (1 == logo) {
+        basic.showLeds(`
+            . # # # .
+            # . # . #
+            # . # # #
+            # . . . #
+            . # # # .
+            `);
+    } else if (0 == logo) {
+        basic.showLeds(`
+            # # # # .
+            # . . . #
+            # # # # .
+            # . # . .
+            # . . # #
+            `);
+    } else {
+        basic.showNumber(lap);
+    }
+    serial.writeNumber(lap);
+    radio.sendNumber(lap);
+});
